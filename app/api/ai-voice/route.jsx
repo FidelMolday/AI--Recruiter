@@ -2,9 +2,10 @@ import OpenAI from "openai"
 import { NextResponse } from "next/server"
 
 const MODELS = [
-  "openai/gpt-3.5-turbo",
+  "openai/gpt-4o-mini",
   "google/gemini-2.0-flash-001",
-  "anthropic/claude-3-haiku",
+  "anthropic/claude-3.5-haiku",
+  "meta-llama/llama-3.3-70b-instruct",
 ]
 
 const FALLBACK_RESPONSES = [
