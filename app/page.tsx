@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Video, Shield, Zap, Users } from "lucide-react";
 
@@ -8,18 +9,26 @@ export default function Home() {
       {/* Header */}
       <header className="border-b bg-white/80 backdrop-blur-sm sticky top-0 z-50">
         <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-xl">AI</span>
-            </div>
-            <span className="font-bold text-xl text-gray-900">InterviewAI</span>
+          <div className="flex items-center gap-3">
+            <Image 
+              alt="AI Recruiter Logo" 
+              loading="lazy" 
+              width={100} 
+              height={100} 
+              decoding="async" 
+              className="w-[50px] h-[50px]" 
+              src="/logo.svg"
+            />
+            <span className="font-bold text-2xl text-gray-900 tracking-tight">AI Recruiter</span>
           </div>
           <div className="flex items-center gap-4">
             <Link href="/auth">
-              <Button variant="ghost">Sign In</Button>
+              <Button variant="ghost" className="font-semibold">Sign In</Button>
             </Link>
             <Link href="/auth">
-              <Button>Get Started</Button>
+              <Button className="font-bold px-6 shadow-lg shadow-primary/20 transition-all hover:scale-105">
+                Get Started
+              </Button>
             </Link>
           </div>
         </div>
@@ -117,14 +126,18 @@ export default function Home() {
       {/* Footer */}
       <footer className="bg-gray-900 text-white py-12 px-4">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold">AI</span>
-            </div>
-            <span className="font-bold">InterviewAI</span>
+          <div className="flex items-center gap-3">
+             <Image 
+              alt="AI Recruiter Logo" 
+              width={100} 
+              height={100} 
+              className="w-[40px] h-[40px] invert" 
+              src="/logo.svg"
+            />
+            <span className="font-bold text-xl tracking-tight">AI Recruiter</span>
           </div>
           <p className="text-gray-400 text-sm">
-            © 2026 InterviewAI. All rights reserved.
+            © 2026 AI Recruiter. All rights reserved.
           </p>
         </div>
       </footer>

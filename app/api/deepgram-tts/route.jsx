@@ -13,9 +13,9 @@ export async function POST(req) {
     // Try Deepgram first (for better quality)
     try {
       const controller = new AbortController()
-      const timeout = setTimeout(() => controller.abort(), 8000)
+      const timeout = setTimeout(() => controller.abort(), 4000)
 
-      const dgResponse = await fetch("https://api.deepgram.com/v1/speak?model=aura-2-thalia-en&encoding=mp3", {
+      const dgResponse = await fetch("https://api.deepgram.com/v1/speak?model=aura-asteria-en&encoding=mp3", {
         method: "POST",
         headers: {
           "Authorization": `Token ${process.env.DEEPGRAM_API_KEY}`,
