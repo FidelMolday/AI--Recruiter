@@ -32,6 +32,7 @@ export default function StartInterview() {
   const startTimeRef = useRef(null)
   const elapsedRef = useRef(0)
   const interviewInfoRef = useRef(null)
+  const questionIndexRef = useRef(0)
 
   // ── UI State ──────────────────────────────────────────────────────────────
   const [callStatus, setCallStatus] = useState('idle')
@@ -89,12 +90,14 @@ Conduct a natural, interactive voice interview.
 
 RULES:
 1. Ask ONE question at a time.
-2. Keep your responses SHORT and CONVERSATIONAL (1-3 sentences max).
-3. After the user answers, briefly acknowledge their point then ask the next question from the list.
-4. If the user's answer is too brief, you can ask a quick follow-up.
-5. End the interview with exactly this phrase: "Thank you so much ${userName}! We'll be in touch soon. Have a great day!"
+2. DO NOT repeat questions you have already asked.
+3. Keep your responses SHORT and CONVERSATIONAL (1-3 sentences max).
+4. After the user answers, briefly acknowledge their point then ask the next question from the list.
+5. If the user's answer is too brief, you can ask a quick follow-up.
+6. Once you have asked all questions in the list below, YOU MUST THANK THE CANDIDATE AND END THE INTERVIEW IMMEDIATELY.
+7. To end the interview, you MUST use exactly this phrase: "Thank you so much ${userName}! We'll be in touch soon. Have a great day!"
 
-QUESTIONS TO ASK:
+QUESTIONS TO ASK (FOLLOW THIS ORDER):
 ${questions}`
   }
 
@@ -323,12 +326,23 @@ ${questions}`
     conversationRef.current.push({ role: 'user', content: text })
 
     try {
+      // Logic to track progress
+      const info = interviewInfoRef.current
+      const questions = Array.isArray(info?.interviewData?.QuestionList) ? info.interviewData.QuestionList : []
+      
+      // If we are at the end, suggest AI to say goodbye
+      const totalQuestions = questions.length
+      const currentPrompt = systemPromptRef.current + 
+        (questionIndexRef.current >= totalQuestions - 1 
+          ? "\n\nCRITICAL: All questions have been covered. Do NOT ask any more questions. Acknowledge and END THE INTERVIEW NOW using the required phrase." 
+          : "")
+
       const res = await fetch('/api/ai-voice', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           messages: conversationRef.current.slice(-10),
-          systemPrompt: systemPromptRef.current,
+          systemPrompt: currentPrompt,
         }),
       })
 
@@ -336,6 +350,9 @@ ${questions}`
       
       const data = await res.json()
       const aiMessage = data.message || 'I see. Let\'s move to the next question.'
+
+      // Increment tracker if the AI didn't end yet (rough estimate)
+      questionIndexRef.current += 1
 
       conversationRef.current.push({ role: 'assistant', content: aiMessage })
       transcriptsRef.current.push({
@@ -345,15 +362,16 @@ ${questions}`
       })
       setTranscript([...transcriptsRef.current])
 
-      const endPhrases = ['thank you so much', 'we\'ll be in touch', 'have a great day', 'goodbye']
+      const endPhrases = ['thank you so much', 'we\'ll be in touch', 'have a great day', 'goodbye', 'best of luck']
       const shouldEnd = endPhrases.some(p => aiMessage.toLowerCase().includes(p))
 
       await speak(aiMessage)
 
       if (!callActiveRef.current) return
 
-      if (shouldEnd) {
-        setTimeout(() => endInterview(), 2000)
+      if (shouldEnd || questionIndexRef.current > totalQuestions + 1) {
+        console.log('[Interview] Final message detected or limit reached - ending')
+        setTimeout(() => endInterview(), 1500)
         return
       }
 
